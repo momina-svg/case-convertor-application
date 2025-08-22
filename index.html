@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Converter Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-weight: 600;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .tool-container {
+            padding: 30px;
+        }
+        
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: inset 0 2px 4px rgba(79, 172, 254, 0.2);
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .counters {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 15px;
+        }
+        
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .counter-icon {
+            background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 600px) {
+            .button-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .tool-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Case Converter Tool</h1>
+            <p>Transform your text with just one click</p>
+        </div>
+        
+        <div class="tool-container">
+            <textarea class="text-input" placeholder="Type or paste your text here..." id="textInput"></textarea>
+            
+            <div class="button-grid">
+                <button class="btn btn-primary" onclick="convertToUpperCase()">
+                    <span>UPPERCASE</span>
+                </button>
+                <button class="btn btn-primary" onclick="convertToLowerCase()">
+                    <span>lowercase</span>
+                </button>
+                <button class="btn btn-primary" onclick="convertToTitleCase()">
+                    <span>Title Case</span>
+                </button>
+                <button class="btn btn-primary" onclick="convertToSentenceCase()">
+                    <span>Sentence case</span>
+                </button>
+                <button class="btn btn-secondary" onclick="clearText()">
+                    <span>Clear text</span>
+                </button>
+                <button class="btn btn-secondary" onclick="copyToClipboard()">
+                    <span>Copy to clipboard</span>
+                </button>
+            </div>
+            
+            <div class="counters">
+                <div class="counter">
+                    <div class="counter-icon">W</div>
+                    <span>Word Count: <span id="wordCount">0</span></span>
+                </div>
+                <div class="counter">
+                    <div class="counter-icon">C</div>
+                    <span>Character Count: <span id="charCount">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const wordCountElement = document.getElementById('wordCount');
+        const charCountElement = document.getElementById('charCount');
+        
+        // Update counts on input
+        textInput.addEventListener('input', updateCounts);
+        
+        function updateCounts() {
+            const text = textInput.value;
+            
+            // Word count (split by whitespace and filter empty strings)
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            wordCountElement.textContent = words.length;
+            
+            // Character count
+            charCountElement.textContent = text.length;
+        }
+        
+        function convertToUpperCase() {
+            textInput.value = textInput.value.toUpperCase();
+            updateCounts();
+        }
+        
+        function convertToLowerCase() {
+            textInput.value = textInput.value.toLowerCase();
+            updateCounts();
+        }
+        
+        function convertToTitleCase() {
+            const text = textInput.value.toLowerCase();
+            textInput.value = text.replace(/\b\w/g, char => char.toUpperCase());
+            updateCounts();
+        }
+        
+        function convertToSentenceCase() {
+            const text = textInput.value.toLowerCase();
+            textInput.value = text.replace(/(^\s*|[.!?]\s+)(\w)/g, (match, p1, p2) => p1 + p2.toUpperCase());
+            updateCounts();
+        }
+        
+        function clearText() {
+            textInput.value = '';
+            updateCounts();
+        }
+        
+        function copyToClipboard() {
+            textInput.select();
+            document.execCommand('copy');
+            
+            // Show a temporary visual indication that text was copied
+            const copyButton = document.querySelector('.btn:last-child');
+            const originalText = copyButton.textContent;
+            copyButton.textContent = 'Copied!';
+            
+            setTimeout(() => {
+                copyButton.textContent = originalText;
+            }, 1500);
+        }
+        
+        // Initialize counts
+        updateCounts();
+    </script>
+</body>
+</html>
